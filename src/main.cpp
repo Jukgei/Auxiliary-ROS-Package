@@ -3,7 +3,7 @@
 #include <ros/ros.h>
 #include <stdlib.h>
 #include "auxiliary/state.h"
-#include "control/controls.h"
+#include "auxiliary/controls.h"
 
 
 int main(int argc, char **argv)

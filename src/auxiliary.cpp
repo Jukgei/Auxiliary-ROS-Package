@@ -5,7 +5,7 @@
 #include <vector>
 #include <unistd.h>
 #include "auxiliary/state.h"
-#include "control/controls.h"
+#include "auxiliary/controls.h"
 #include "../include/auxiliary/auxiliary.hpp"
 #include "functional"
 
@@ -41,11 +41,11 @@ void auxiliary::auxiliaryNode::InitOptFlowThread(){
 }
 
 void auxiliary::auxiliaryNode::InitSubcribers(ros::NodeHandle &n){
-    ArmControlSubscriber = n.subscribe<control::controls>
+    ArmControlSubscriber = n.subscribe<auxiliary::controls>
         ("controls",10,&auxiliaryNode::GetArmControlsCallBack,this);
 }
 
-void auxiliary::auxiliaryNode::GetArmControlsCallBack(const control::controls::ConstPtr& msg){
+void auxiliary::auxiliaryNode::GetArmControlsCallBack(const auxiliary::controls::ConstPtr& msg){
     //Get Arm Position controls and time controls
     std::vector<uint16_t> ArmCtrPos = msg->armCtr;
     std::vector<uint16_t> ArmCtrTime = msg->timeCtr;

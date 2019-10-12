@@ -10,7 +10,7 @@
 #include <vector>
 #include <functional>
 
-#include "control/controls.h"
+#include "auxiliary/controls.h"
 
 #define FIRST_HEADER            0
 #define SECOND_HEADER           1
@@ -128,7 +128,7 @@ public:
 private:
     ros::Publisher AuxiliaryPublisher;
     ros::Subscriber ArmControlSubscriber;
-    void GetArmControlsCallBack(const control::controls::ConstPtr& msg);
+    void GetArmControlsCallBack(const auxiliary::controls::ConstPtr& msg);
     uint16_t PublishFrequency;
     
     std::vector<std::_Bind_helper<false, void (auxiliaryNode::*)(auxiliaryNode *),auxiliaryNode*, auxiliaryNode*&>::type> b;
