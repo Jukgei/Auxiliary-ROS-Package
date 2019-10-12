@@ -2,7 +2,8 @@
 #include <thread>
 #include <mutex>
 #include <ros/ros.h>
-#include "../include/auxiliary/auxiliary.hpp"
+#include "../include/auxiliary/arm.hpp"
+//#include "../include/auxiliary/auxiliary.hpp"
 
 using namespace std;
 /*
