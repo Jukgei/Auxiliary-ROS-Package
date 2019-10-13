@@ -72,6 +72,10 @@ void auxiliary ::DataPackage::SendControlPackage( serial::Serial &s ){
     
     if(s.isOpen()){
         size_t byte = s.write( package, 25 );
+        //DEBUG PRINT
+        //for(int i = 0; i < 25; i++)
+        //    printf("%x ", this->package[i]);
+        //printf("\n");
         if(byte == 25){
             //std::cout<<"Send success"<< std::endl;
         }   
@@ -139,13 +143,13 @@ void auxiliary ::DataPackage::SendControlPackage( serial::Serial &s ){
 
 //Should I combine the ReceiveMsg and DecoderPackage? Because the new and delete at two difference function.
 void auxiliary ::DataPackage::ReceiveMsg(serial::Serial &mySerial , auxiliary::arm (&p1)[6]){
-    std::cout<<"Coming ReceiveMsg"<<std::endl;
+    //std::cout<<"Coming ReceiveMsg"<<std::endl;
     if(mySerial.isOpen() == true){
         size_t num = mySerial.available();
         this->rev = new uint8_t[num];
         mySerial.read(rev,num);
         RevSize = num;
-        cout<<"Receive num:"<<num<<endl;
+        //cout<<"Receive num:"<<num<<endl;
     }
     else{
         std::cout<<"Serial is not opening"<<std::endl;
@@ -222,7 +226,9 @@ void auxiliary ::DataPackage::GroupFrames(const auxiliary ::arm (&p1)[6]){
     //package[GIMBAL_PITCH_CTR_L] = 0;
     //package[GIMBAL_PITCH_CTR_H] = 0;
     //package[FB_CTR] = feedback;
-
+    
+    //for(int i = 1; i <= 5; i ++)
+    //        printf("Arm[%d] Ctr Pos: %d, Ctr Time:%d \n",i,p1[i].GetCtrPos(),p1[i].GetCtrTime());
 }
 
 //void auxiliary ::DataPackage::DebugPrint( const auxiliary ::arm (&p1)[6] ) const{

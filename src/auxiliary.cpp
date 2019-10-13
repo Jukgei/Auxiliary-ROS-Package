@@ -60,7 +60,9 @@ void auxiliary::auxiliaryNode::GetArmControlsCallBack(const auxiliary::controls:
         this->myArm[i].CtrPos(ArmCtrPos[i]);
         this->myArm[i].CtrTime(ArmCtrTime[i]);
     }
-    
+    //DEBUG PRINT
+    //for(int i = 1; i <= 5; i ++)
+    //        printf("Arm[%d] Ctr Pos: %d, Ctr Time:%d \n",i,myArm[i].GetCtrPos(),myArm[i].GetCtrTime());
 }
 
 void auxiliary::auxiliaryNode::DataPackageThread(){
@@ -75,11 +77,11 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
     
     while(true){
         this->myPackage.ReceiveMsg(myserial,this->myArm);
-        std::cout<<"Receive success"<<std::endl;
+        //std::cout<<"Receive success"<<std::endl;
         this->myPackage.GroupFrames(this->myArm);
-        std::cout<<"GroupFrames success"<<std::endl;
+        //std::cout<<"GroupFrames success"<<std::endl;
         this->myPackage.SendControlPackage(myserial);
-        std::cout<<"SendControl"<<std::endl;
+        //std::cout<<"SendControl"<<std::endl;
         //Don't clear feedback Bit
         usleep(10000); //10ms
     }
