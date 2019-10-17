@@ -10,6 +10,7 @@
 #include <vector>
 #include <functional>
 
+#include "OpticalFlow.hpp"
 #include "auxiliary/controls.h"
 
 #define FIRST_HEADER            0
@@ -120,6 +121,7 @@ public:
     void InitOptFlowThread();
     void Publish();
     void DataPackageThread();
+    void OpticalFlowThread(); 
     void SetPublishFrequency(uint16_t frequency);
 
 

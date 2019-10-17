@@ -4,6 +4,8 @@
 #include <ros/ros.h>
 #include <vector>
 #include <unistd.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
 #include "auxiliary/state.h"
 #include "auxiliary/controls.h"
 #include "../include/auxiliary/auxiliary.hpp"
@@ -37,7 +39,8 @@ void auxiliary::auxiliaryNode::InitDataPackageThread(){
 }
 
 void auxiliary::auxiliaryNode::InitOptFlowThread(){
-
+    std::thread Opt(std::bind(&auxiliaryNode::OpticalFlowThread,this));
+    Opt.detach();
 }
 
 void auxiliary::auxiliaryNode::InitSubcribers(ros::NodeHandle &n){
@@ -87,6 +90,27 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
     }
 
 }
+
+void auxiliary::auxiliaryNode::OpticalFlowThread(){
+    auxiliary::OpticalFlow myOpticalFlow(true);
+    //VideoCapture cap(0);
+    //if(!cap.isOpened()){
+    //    std::cout<<"Camera open error!"<<std::endl;
+    //    return ;
+    //}
+    //Mat frame;
+    while(true){
+        myOpticalFlow.ImageShow();
+        
+        
+        if(waitKey(1) == 'q')
+            break;
+    }
+    
+    destroyWindow(myOpticalFlow.ReturnDisplayName());
+    std::cout<<"OpticalFlow Close."<<std::endl;
+}
+
 
 void auxiliary::auxiliaryNode::Publish(){
     auxiliary::state sta;
