@@ -93,17 +93,26 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
     auxiliary::OpticalFlow myOpticalFlow(true);
-    //VideoCapture cap(0);
-    //if(!cap.isOpened()){
-    //    std::cout<<"Camera open error!"<<std::endl;
-    //    return ;
-    //}
-    //Mat frame;
     while(true){
-        myOpticalFlow.ImageShow();
+        myOpticalFlow.GetImage();
+    
+        if(myOpticalFlow.ReturnTrackPointsSize() >0){
+            std::cout<<"Tracking"<<std::endl;
+            myOpticalFlow.OpticalTracking();
+        }
+
         
         
-        if(waitKey(1) == 'q')
+        if(myOpticalFlow.ReturnisFindFeature()){
+            std::cout<<"Find Feature Point"<<std::endl;
+            myOpticalFlow.FindFeaturePoints();
+        }
+
+
+        myOpticalFlow.Update();
+
+        
+        if(waitKey(30) == 'q')
             break;
     }
     

@@ -18,6 +18,13 @@ public:
     void GetImage();
     std::string ReturnDisplayName();
     void FindFeaturePoints();
+    void OpticalTracking();
+    void Update();
+    void PointVectorErr(const std::vector<Point2f> a,const std::vector<Point2f> b,std::vector<Point2f> &d); 
+    void JudgmentPoint(const std::vector<Point2f> err, std::vector<bool>  &isNice);
+    int ReturnTrackPointsSize();
+    bool ReturnisFindFeature();
+    void IntPointToFloat(const std::vector<Point2i> i, std::vector<Point2f> &f);
 
 
 private:
@@ -25,14 +32,16 @@ private:
     Mat FrameRGB;
     Mat FrameGray;
     Mat FrameGrayPrev;
-    
+    Mat Visualization; 
 
     VideoCapture Cap; 
     std::string DisplayName;
-    std::vector<Point2f> TrackPoints;
+    std::vector<std::vector<Point2f>> TrackPoints;
 
 
     uint8_t FrameId;
+    bool isFindFeature;
+    uint8_t DetectInterval;
 
     //Parameters
     int MaxCorners;
@@ -41,6 +50,11 @@ private:
     int BlockSize;
     double k;
     bool UseHarris;
+   
+    
+    TermCriteria termcrit;
+
+    uint8_t TrackLen;
 };
 
 }
