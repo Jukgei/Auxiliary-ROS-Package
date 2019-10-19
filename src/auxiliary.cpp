@@ -8,6 +8,7 @@
 #include <opencv2/highgui.hpp>
 #include "auxiliary/state.h"
 #include "auxiliary/controls.h"
+#include "auxiliary/opticalflow.h"
 #include "../include/auxiliary/auxiliary.hpp"
 #include "functional"
 
@@ -27,6 +28,8 @@ auxiliary::auxiliaryNode::auxiliaryNode(ros::NodeHandle &n){
 void auxiliary::auxiliaryNode::InitPublishers(ros::NodeHandle &n){
     AuxiliaryPublisher = n.advertise<auxiliary::state>("state",10);
     //SetTest(50);
+    OptiFlowPublisher = n.advertise<auxiliary::opticalflow>("opticalflow",10);
+     
     SetPublishFrequency(50);
     std::thread pub(std::bind(&auxiliaryNode::Publish, this));
 
@@ -93,27 +96,40 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
     auxiliary::OpticalFlow myOpticalFlow(true);
+    Point2f DeltaPosition;
     while(true){
-        myOpticalFlow.GetImage();
+        if(!myOpticalFlow.GetImage()){
+            continue;
+        }
     
         if(myOpticalFlow.ReturnTrackPointsSize() >0){
-            std::cout<<"Tracking"<<std::endl;
-            myOpticalFlow.OpticalTracking();
+            //std::cout<<"Tracking"<<std::endl;
+            DeltaPosition = myOpticalFlow.OpticalTracking();
         }
-
-        
         
         if(myOpticalFlow.ReturnisFindFeature()){
-            std::cout<<"Find Feature Point"<<std::endl;
+            //std::cout<<"Find Feature Point"<<std::endl;
             myOpticalFlow.FindFeaturePoints();
         }
-
 
         myOpticalFlow.Update();
 
         
-        if(waitKey(30) == 'q')
-            break;
+        //publish position data
+        std::vector<float> OpticalflowData;
+        OpticalflowData.push_back(DeltaPosition.x);
+        OpticalflowData.push_back(DeltaPosition.y);
+        auxiliary::opticalflow opt; 
+        opt.displacement = OpticalflowData;
+        this->OptiFlowPublisher.publish(opt);
+
+        if(myOpticalFlow.ReturnDisplay()){
+            if(waitKey(30) == 'q')
+                break;
+        }
+        else
+            usleep(30000);
+       
     }
     
     destroyWindow(myOpticalFlow.ReturnDisplayName());

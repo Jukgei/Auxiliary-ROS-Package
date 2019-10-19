@@ -129,11 +129,13 @@ public:
     //void SetTest(int test);
 private:
     ros::Publisher AuxiliaryPublisher;
+    ros::Publisher OptiFlowPublisher;
+
     ros::Subscriber ArmControlSubscriber;
     void GetArmControlsCallBack(const auxiliary::controls::ConstPtr& msg);
     uint16_t PublishFrequency;
     
-    std::vector<std::_Bind_helper<false, void (auxiliaryNode::*)(auxiliaryNode *),auxiliaryNode*, auxiliaryNode*&>::type> b;
+    //std::vector<std::_Bind_helper<false, void (auxiliaryNode::*)(auxiliaryNode *),auxiliaryNode*, auxiliaryNode*&>::type> b;
     //std::thread * PublishThread;
 };
 

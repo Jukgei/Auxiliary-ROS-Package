@@ -15,17 +15,18 @@ namespace auxiliary{
 class OpticalFlow{
 public:
     OpticalFlow(bool Display);
-    void GetImage();
+    bool GetImage();
     std::string ReturnDisplayName();
     void FindFeaturePoints();
-    void OpticalTracking();
+    Point2f OpticalTracking();
     void Update();
     void PointVectorErr(const std::vector<Point2f> a,const std::vector<Point2f> b,std::vector<Point2f> &d); 
     void JudgmentPoint(const std::vector<Point2f> err, std::vector<bool>  &isNice);
     int ReturnTrackPointsSize();
     bool ReturnisFindFeature();
-    void IntPointToFloat(const std::vector<Point2i> i, std::vector<Point2f> &f);
-
+    bool ReturnDisplay();
+    //void IntPointToFloat(const std::vector<Point2i> i, std::vector<Point2f> &f);
+    ~OpticalFlow();
 
 private:
     bool Display;
@@ -55,6 +56,8 @@ private:
     TermCriteria termcrit;
 
     uint8_t TrackLen;
+    
+    Point2f Displacement;
 };
 
 }
