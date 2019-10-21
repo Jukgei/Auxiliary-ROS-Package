@@ -18,7 +18,7 @@
 #define FIRST_ARM_POS_CTR_L     2
 #define FIRST_ARM_POS_CTR_H     3
 #define FIRST_ARM_TIM_CTR_L     4
-#define FIRST_ARM_TIM_CTR_R     5
+#define FIRST_ARM_TIM_CTR_H     5
 #define SECOND_ARM_POS_CTR_L    6
 #define SECOND_ARM_POS_CTR_H    7
 #define SECOND_ARM_TIM_CTR_L    8
@@ -26,15 +26,15 @@
 #define THIRD_ARM_POS_CTR_L     10
 #define THIRD_ARM_POS_CTR_H     11
 #define THIRD_ARM_TIM_CTR_L     12
-#define THIRD_ARM_TIM_CTR_R     13
+#define THIRD_ARM_TIM_CTR_H     13
 #define FOURTH_ARM_POS_CTR_L    14
 #define FOURTH_ARM_POS_CTR_H    15 
 #define FOURTH_ARM_TIM_CTR_L    16
-#define FOURTH_ARM_TIM_CTR_R    17 
+#define FOURTH_ARM_TIM_CTR_H    17 
 #define FIFTH_ARM_POS_CTR_L     18
 #define FIFTH_ARM_POS_CTR_H     19
 #define FIFTH_ARM_TIM_CTR_L     20
-#define FIFTH_ARM_TIM_CTR_R     21
+#define FIFTH_ARM_TIM_CTR_H     21
 #define GRIPPER_CTR             22
 //#define GIMBAL_YAW_CTR_L        23
 //#define GIMBAL_YAW_CTR_H        24
