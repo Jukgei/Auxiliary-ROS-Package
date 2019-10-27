@@ -11,6 +11,19 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display){
         std::cout<<"Cannot open camera."<<std::endl;
         return ;
     }
+    fps = Cap.get(CAP_PROP_FPS); //get fps
+    std::cout<<"FPS:"<<fps<<std::endl;
+    if(fps <= 0 )
+        fps = 25;
+    vw.open("~/Documents/opticalflow.mp4",
+            VideoWriter::fourcc('M','P','4','V'),
+            fps,
+            Size(Cap.get(CAP_PROP_FRAME_WIDTH)/2,
+                 Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
+            );
+    if(!vw.isOpened()){
+        std::cout<<"Video write error!"<<std::endl;
+    }
 
     //Parameter
     MaxCorners = 500;
@@ -145,6 +158,7 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
             DrawPointSet.clear();
         }
     }
+    vw.write(Visualization);
     return Displacement;
 }
 

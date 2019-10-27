@@ -39,6 +39,9 @@ private:
     std::string DisplayName;
     std::vector<std::vector<Point2f>> TrackPoints;
 
+    //Some variable about video write
+    int fps;
+    VideoWriter vw;
 
     uint8_t FrameId;
     bool isFindFeature;
