@@ -15,11 +15,11 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display){
     std::cout<<"FPS:"<<fps<<std::endl;
     if(fps <= 0 )
         fps = 25;
-    vw.open("~/Documents/opticalflow.mp4",
-            VideoWriter::fourcc('M','P','4','V'),
+    vw.open("opticalflowvideo/opticalflow.avi",
+            CV_FOURCC('M','J','P','G'),
             fps,
-            Size(Cap.get(CAP_PROP_FRAME_WIDTH)/2,
-                 Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
+            Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
+                 (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
             );
     if(!vw.isOpened()){
         std::cout<<"Video write error!"<<std::endl;
