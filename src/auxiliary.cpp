@@ -124,7 +124,7 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
             continue;
         }
     
-        if(myOpticalFlow.ReturnTrackPointsSize() >0){
+        if(myOpticalFlow.ReturnTrackPointsSize() >0 ){
             //std::cout<<"Tracking"<<std::endl;
             DeltaPosition = myOpticalFlow.OpticalTracking();
         }

@@ -25,20 +25,24 @@ public:
     int ReturnTrackPointsSize();
     bool ReturnisFindFeature();
     bool ReturnDisplay();
+    void DetectShadow(const std::vector<Point2i> featurepoint);
     //void IntPointToFloat(const std::vector<Point2i> i, std::vector<Point2f> &f);
     ~OpticalFlow();
+
 
 private:
     bool Display;
     Mat FrameRGB;
     Mat FrameGray;
+    Mat Y;
     Mat FrameGrayPrev;
     Mat Visualization; 
+    double LumenMean;
 
     VideoCapture Cap; 
     std::string DisplayName;
     std::vector<std::vector<Point2f>> TrackPoints;
-
+    std::vector<std::vector<Point2f>> TrackPointsShadows;
     //Some variable about video write
     int fps;
     VideoWriter vw;
@@ -54,13 +58,15 @@ private:
     int BlockSize;
     double k;
     bool UseHarris;
-   
     
     TermCriteria termcrit;
 
     uint8_t TrackLen;
     
     Point2f Displacement;
+
+    std::vector<Point2i> Shadow;
+    std::vector<Point2i> Normal;
 };
 
 }

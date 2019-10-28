@@ -50,9 +50,18 @@ auxiliary::OpticalFlow::~OpticalFlow(){
 
 bool auxiliary::OpticalFlow::GetImage(){
     Mat buf;
+    Mat FrameYCrCb;
+    std::vector<Mat> channels;
     if(Cap.read(buf)){
         resize(buf, FrameRGB, Size(buf.cols/2,buf.rows/2),0,0,INTER_LINEAR);
         cvtColor(FrameRGB,FrameGray,CV_BGR2GRAY);
+        cvtColor(FrameRGB,FrameYCrCb,CV_BGR2YCrCb);
+        Scalar YCrCbMean = mean(FrameYCrCb);
+        split(FrameYCrCb, channels);
+        Y = channels.at(0);     //cv_8UC1
+        //std::cout<<"Y type is:" <<Y.type()<<std::endl;
+        LumenMean = YCrCbMean[0];
+        std::cout<<"LumenMean is:" <<LumenMean << std::endl;
         if(Display)
             FrameRGB.copyTo(Visualization);
         return true;
@@ -102,8 +111,8 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
                          err,winSize,
                          2,termcrit);
     PointVectorErr(p0,p0r,d); 
-    //for(uint32_t i = 0; i < status.size(); i++)
-    //    printf("%d\n",status[i]);
+    
+    //for(uint32_t i = 0; i < status.size(); i++) //    printf("%d\n",status[i]);
     //for(uint32_t i = 0; i < p1.size(); i++)
     //    printf("(%f,%f)\n",p1[i].x,p1[i].y);
     //for(uint32_t i = 0; i < d.size(); i++)
@@ -158,7 +167,95 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
             DrawPointSet.clear();
         }
     }
+   
+
+////////////////////////Bad Point
+    
+    p0.clear();
+    p1.clear();
+    p0r.clear();
+    status.clear();
+    err.clear();
+    d.clear();
+    isNice.clear();
+    NewTrackPoints.clear();
+    //Size winSize(15,15);
+    for(uint32_t i = 0; i < TrackPointsShadows.size(); i++){
+        std::vector<Point2f> temp;
+        temp = TrackPointsShadows[i];
+        //printf("(%f,%f)",temp[temp.size()-1].x,temp[temp.size()-1].y);
+        //std::cout<<"temp"<<temp[temp.size()-1].x<<','<<temp[temp.size()-1].y<<' '<<std::endl;
+        p0.push_back(temp[temp.size()-1]);
+    }
+    //for(uint32_t i = 0; i < p0.size(); i++)
+    //    printf("(%f,%f)\n",p0[i].x,p0[i].y);
+    //for(uint32_t i = 0; i < p0.size();i++)
+    //    std::cout<<p0[i]<<std::endl;
+    calcOpticalFlowPyrLK(img0,img1,
+                         p0,p1,status,
+                         err, winSize,
+                         2,termcrit);
+
+    calcOpticalFlowPyrLK(img1,img0,
+                         p1,p0r,status,
+                         err,winSize,
+                         2,termcrit);
+    PointVectorErr(p0,p0r,d); 
+    
+    //for(uint32_t i = 0; i < status.size(); i++) //    printf("%d\n",status[i]);
+    //for(uint32_t i = 0; i < p1.size(); i++)
+    //    printf("(%f,%f)\n",p1[i].x,p1[i].y);
+    //for(uint32_t i = 0; i < d.size(); i++)
+    //    printf("(%f,%f)\n",d[i].x,d[i].y);
+    //for(uint32_t i = 0; i < p0.size(); i++){
+    //    //std::cout<<'('<<p0[i].x<<','<<p0[i].y<<')'<<
+    //    //    ' '<<'('<<p0r[i].x<<','<<p0r[i].y<<')'<<std::endl;
+    //    printf("p0:(%f,%f),p0r:(%f,%f)\n",p0[i].x,p0[i].y,p0r[i].x,p0r[i].y);
+    //}
+
+    //num = 0;
+    //SumErr.x = 0;
+    //SumErr.y = 0;
+    JudgmentPoint(d,isNice);
+    for(uint32_t i = 0; i < p1.size(); i++){
+        if( !isNice[i] )
+            continue;
+
+        std::vector<Point2f> temp = TrackPointsShadows[i];
+        //SumErr = (p1[i]  - temp[temp.size()-1] ) + SumErr; 
+        //num++;
+        temp.push_back(p1[i]);
+        if(temp.size() > TrackLen){
+            std::vector<Point2f>::iterator k = temp.begin();
+            temp.erase(k); //Delet the first element
+        }
+        NewTrackPoints.push_back(temp);
+        if(Display)
+            circle(Visualization,p1[i],2, Scalar(0,0,255), -1);
+    }
+    //Displacement.x = SumErr.x/num;
+    //Displacement.y = SumErr.y/num; 
+    //if(std::isnan(Displacement.x) || std::isnan(Displacement.y))
+    //    printf("num = %d\n SumErr(%f,%f)",num,SumErr.x,SumErr.y);
+    //std::cout<<"("<<Displacement.x<<','<<Displacement.y<<')'<<std::endl;
+    //Now Publish 
+    TrackPointsShadows = NewTrackPoints;
+    //std::cout<<"TrackPoints Num :"<<TrackPoints.size()<<std::endl;
+    if(Display){
+        std::vector<Point2i> DrawPointSet;
+        for(uint32_t i = 0 ; i < TrackPointsShadows.size(); i++){
+            std::vector<Point2f> temp = TrackPointsShadows[i];
+            for(uint32_t i = 0; i < temp.size(); i++){
+                //std::cout<<'('<<IntPoint.x<<","<<IntPoint.y<<')'<<' '<<std::endl;
+                DrawPointSet.push_back(Point2i(temp[i]));
+            }
+            polylines(Visualization,DrawPointSet,false,Scalar(0,0,255));
+            DrawPointSet.clear();
+        }
+    }
+    
     vw.write(Visualization);
+    
     return Displacement;
 }
 
@@ -191,6 +288,13 @@ void auxiliary::OpticalFlow::FindFeaturePoints(){
         Point2i temp = point[point.size()-1];
         circle(mask,temp,5,0,-1);
     }
+
+    for( uint32_t i = 0; i < TrackPointsShadows.size(); i++   ) {
+        std::vector<Point2f> point = TrackPointsShadows[i];
+        Point2i temp = point[point.size()-1];
+        circle(mask,temp,5,0,-1);
+    }
+
     std::vector<Point2i> p; 
     goodFeaturesToTrack(FrameGray,
                         p,
@@ -202,17 +306,39 @@ void auxiliary::OpticalFlow::FindFeaturePoints(){
                         UseHarris,
                         k);
 
-    if(!p.empty()){
+    DetectShadow(p);
+
+    if(!Normal.empty()){
         //std::vector<Point2f> temp;
         //IntPointToFloat(p,temp);
-        for(uint32_t i = 0; i < p.size(); i++ ){
+        for(uint32_t i = 0; i < Normal.size(); i++ ){
             std::vector<Point2f> buf;
-            buf.push_back(Point2f(p[i]));
+            buf.push_back(Point2f(Normal[i]));
             TrackPoints.push_back(buf);
             buf.clear();
         }
     }
+    
+    if(!Shadow.empty()){
+        for(uint32_t i = 0; i < Shadow.size(); i++){
+            std::vector<Point2f> buf;
+            buf.push_back(Point2f(Shadow[i]));
+            TrackPointsShadows.push_back(buf);
+            buf.clear();
+        }
+    }
 
+}
+
+void auxiliary::OpticalFlow::DetectShadow(const std::vector<Point2i> featurepoint){
+    Shadow.clear();
+    Normal.clear();
+    for(uint32_t i = 0; i < featurepoint.size(); i++){
+        if(Y.at<uchar>(featurepoint[i]) < LumenMean * 1)
+            Shadow.push_back(featurepoint[i]);
+        else
+            Normal.push_back(featurepoint[i]);
+    }
 }
 
 void auxiliary::OpticalFlow::Update(){
@@ -229,7 +355,7 @@ void auxiliary::OpticalFlow::Update(){
 } 
 
 int auxiliary::OpticalFlow::ReturnTrackPointsSize(){
-    return TrackPoints.size();
+    return TrackPoints.size()<TrackPointsShadows.size()?TrackPoints.size():TrackPointsShadows.size() ;
 }
 
 bool auxiliary::OpticalFlow::ReturnisFindFeature(){
