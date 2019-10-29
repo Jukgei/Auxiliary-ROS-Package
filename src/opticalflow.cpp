@@ -21,8 +21,19 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display){
             Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
                  (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
             );
+
+    vg.open("opticalflowvideo/opticalflowRGB.avi",
+            CV_FOURCC('M','J','P','G'),
+            fps,
+            Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
+                 (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
+           );
+
     if(!vw.isOpened()){
         std::cout<<"Video write error!"<<std::endl;
+    }
+    if(!vg.isOpened()){
+        std::cout<<"RGB write error!"<<std::endl;
     }
 
     //Parameter
@@ -62,6 +73,7 @@ bool auxiliary::OpticalFlow::GetImage(){
         //std::cout<<"Y type is:" <<Y.type()<<std::endl;
         LumenMean = YCrCbMean[0];
         std::cout<<"LumenMean is:" <<LumenMean << std::endl;
+        vg.write(FrameRGB);
         if(Display)
             FrameRGB.copyTo(Visualization);
         return true;
@@ -255,7 +267,6 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
     }
     
     vw.write(Visualization);
-    
     return Displacement;
 }
 

@@ -46,6 +46,7 @@ private:
     //Some variable about video write
     int fps;
     VideoWriter vw;
+    VideoWriter vg;
 
     uint8_t FrameId;
     bool isFindFeature;
