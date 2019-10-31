@@ -117,7 +117,7 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 }
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
-    auxiliary::OpticalFlow myOpticalFlow(true);
+    auxiliary::OpticalFlow myOpticalFlow(true, true); //Two Parameter: isDisplay and isSave 
     Point2f DeltaPosition;
     while(true){
         if(!myOpticalFlow.GetImage()){

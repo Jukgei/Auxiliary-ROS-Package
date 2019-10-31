@@ -1,9 +1,10 @@
 #include "../include/auxiliary/OpticalFlow.hpp"
 
-auxiliary::OpticalFlow::OpticalFlow(bool Display){
+auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
    //this->Cap = VideoCapture a(0);
     VideoCapture buff(0);
     this->Cap = buff;
+    this->Save = Save;
     this->Display = Display;
     FrameId = 0;
     DisplayName = "OpticalFlow";
@@ -15,14 +16,16 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display){
     std::cout<<"FPS:"<<fps<<std::endl;
     if(fps <= 0 )
         fps = 25;
-    vw.open("opticalflowvideo/opticalflow.avi",
-            CV_FOURCC('M','J','P','G'),
-            fps,
-            Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
-                 (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
-            );
-    if(!vw.isOpened()){
-        std::cout<<"Video write error!"<<std::endl;
+    if(Save){
+        vw.open("opticalflowvideo/opticalflow.avi",
+                CV_FOURCC('M','J','P','G'),
+                fps,
+                Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
+                     (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
+                );
+        if(!vw.isOpened()){
+            std::cout<<"Video write error!"<<std::endl;
+        }
     }
 
     //Parameter
@@ -42,6 +45,9 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display){
 
     Displacement.x = 0;
     Displacement.y = 0;
+
+    PatchSize = 10;
+
 }
 
 auxiliary::OpticalFlow::~OpticalFlow(){
@@ -50,9 +56,21 @@ auxiliary::OpticalFlow::~OpticalFlow(){
 
 bool auxiliary::OpticalFlow::GetImage(){
     Mat buf;
+    Mat FrameYCrCb;
     if(Cap.read(buf)){
         resize(buf, FrameRGB, Size(buf.cols/2,buf.rows/2),0,0,INTER_LINEAR);
+        Width = FrameRGB.cols;
+        Height = FrameRGB.rows;
         cvtColor(FrameRGB,FrameGray,CV_BGR2GRAY);
+        threshold(FrameGray, FrameBin, 0, 255, CV_THRESH_OTSU);
+        cvtColor(FrameRGB,FrameYCrCb,CV_BGR2YCrCb);
+        Scalar YCrCbMean = mean(FrameYCrCb);
+        std::vector<Mat> channels;
+        split(FrameYCrCb, channels);
+        Y = channels.at(0);     //cv_8UC1
+        //std::cout<<"Y type is:" <<Y.type()<<std::endl;
+        LumenMean = YCrCbMean[0];
+        
         if(Display)
             FrameRGB.copyTo(Visualization);
         return true;
@@ -158,7 +176,8 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
             DrawPointSet.clear();
         }
     }
-    vw.write(Visualization);
+    if(Save)
+        vw.write(Visualization);
     return Displacement;
 }
 
@@ -201,13 +220,14 @@ void auxiliary::OpticalFlow::FindFeaturePoints(){
                         BlockSize,
                         UseHarris,
                         k);
+    DetectShadow(p);
 
-    if(!p.empty()){
+    if(!NicePoint.empty()){
         //std::vector<Point2f> temp;
         //IntPointToFloat(p,temp);
-        for(uint32_t i = 0; i < p.size(); i++ ){
+        for(uint32_t i = 0; i < NicePoint.size(); i++ ){
             std::vector<Point2f> buf;
-            buf.push_back(Point2f(p[i]));
+            buf.push_back(Point2f(NicePoint[i]));
             TrackPoints.push_back(buf);
             buf.clear();
         }
@@ -227,6 +247,41 @@ void auxiliary::OpticalFlow::Update(){
       imshow(ReturnDisplayName(),Visualization);
     
 } 
+
+void auxiliary::OpticalFlow::DetectShadow( const std::vector<Point2i> featurepoint ){
+    NicePoint.clear();
+    for(uint32_t i = 0; i < featurepoint.size(); i++){
+        if(featurepoint[i].x - PatchSize > 0 &&
+           featurepoint[i].x + PatchSize < Width &&
+           featurepoint[i].y - PatchSize >= 0 &&
+           featurepoint[i].y + PatchSize < Height){
+            
+            int StartRow = featurepoint[i].y - PatchSize;
+            int EndRow = featurepoint[i].y + PatchSize;
+            int StartCol = featurepoint[i].x - PatchSize;
+            int EndCol = featurepoint[i].x + PatchSize;
+            uint32_t sum = 0;
+            for(int j = StartRow; j <= EndRow; j++){
+                uchar * pdata = FrameBin.ptr<uchar>(j);
+                uchar * pdat  = Y.ptr<uchar>(j);
+                for( int k = StartCol; k <= EndCol; k++ )
+                    sum += *pdata++;
+            }
+            if(sum > 0.75 * 255.0 * 2 * PatchSize * 2 * PatchSize)
+                NicePoint.push_back(featurepoint[i]);
+            else{
+                if(Y.at<uchar>(featurepoint[i]) > LumenMean * 1.2 || 
+                   Y.at<uchar>(featurepoint[i]) < LumenMean * 0.4)
+                    NicePoint.push_back(featurepoint[i]);
+
+            }
+        
+        }
+        else
+            continue;
+    }
+}
+
 
 int auxiliary::OpticalFlow::ReturnTrackPointsSize(){
     return TrackPoints.size();

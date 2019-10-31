@@ -14,7 +14,7 @@ namespace auxiliary{
 
 class OpticalFlow{
 public:
-    OpticalFlow(bool Display);
+    OpticalFlow(bool Display, bool Save);
     bool GetImage();
     std::string ReturnDisplayName();
     void FindFeaturePoints();
@@ -25,19 +25,24 @@ public:
     int ReturnTrackPointsSize();
     bool ReturnisFindFeature();
     bool ReturnDisplay();
+    void DetectShadow(const std::vector<Point2i> featurepoint);
     //void IntPointToFloat(const std::vector<Point2i> i, std::vector<Point2f> &f);
     ~OpticalFlow();
 
 private:
     bool Display;
+    bool Save;
     Mat FrameRGB;
     Mat FrameGray;
     Mat FrameGrayPrev;
     Mat Visualization; 
+    Mat Y;
+    Mat FrameBin;
 
     VideoCapture Cap; 
     std::string DisplayName;
     std::vector<std::vector<Point2f>> TrackPoints;
+    std::vector<Point2i> NicePoint;
 
     //Some variable about video write
     int fps;
@@ -60,6 +65,10 @@ private:
 
     uint8_t TrackLen;
     
+    int PatchSize;
+    int Width;
+    int Height;
+    int LumenMean;
     Point2f Displacement;
 };
 
