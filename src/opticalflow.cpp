@@ -23,8 +23,17 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
                 Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
                      (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
                 );
+        raw.open("opticalflowvideo/opticalflowRGB.avi",
+                CV_FOURCC('M','J','P','G'),
+                fps,
+                Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
+                     (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
+                );
         if(!vw.isOpened()){
             std::cout<<"Video write error!"<<std::endl;
+        }
+        if(!raw.isOpened()){
+            std::cout<<"Video(RGB) write error!"<<std::endl;
         }
     }
 
@@ -46,7 +55,7 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
     Displacement.x = 0;
     Displacement.y = 0;
 
-    PatchSize = 10;
+    PatchSize = 6;
 
 }
 
@@ -59,6 +68,7 @@ bool auxiliary::OpticalFlow::GetImage(){
     Mat FrameYCrCb;
     if(Cap.read(buf)){
         resize(buf, FrameRGB, Size(buf.cols/2,buf.rows/2),0,0,INTER_LINEAR);
+        raw.write(FrameRGB);
         Width = FrameRGB.cols;
         Height = FrameRGB.rows;
         cvtColor(FrameRGB,FrameGray,CV_BGR2GRAY);
@@ -267,7 +277,7 @@ void auxiliary::OpticalFlow::DetectShadow( const std::vector<Point2i> featurepoi
                 for( int k = StartCol; k <= EndCol; k++ )
                     sum += *pdata++;
             }
-            if(sum > 0.75 * 255.0 * 2 * PatchSize * 2 * PatchSize)
+            if(sum > 0.8 * 255.0 * 2 * PatchSize * 2 * PatchSize)
                 NicePoint.push_back(featurepoint[i]);
             else{
                 if(Y.at<uchar>(featurepoint[i]) > LumenMean * 1.2 || 
