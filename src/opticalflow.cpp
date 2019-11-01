@@ -71,7 +71,7 @@ bool auxiliary::OpticalFlow::GetImage(){
         //std::cout<<"Y type is:" <<Y.type()<<std::endl;
         LumenMean = YCrCbMean[0];
         
-        if(Display)
+        if(Display || Save)
             FrameRGB.copyTo(Visualization);
         return true;
     }
@@ -148,7 +148,7 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
             temp.erase(k); //Delet the first element
         }
         NewTrackPoints.push_back(temp);
-        if(Display)
+        if(Display || Save)
             circle(Visualization,p1[i],2, Scalar(0,255,0), -1);
     }
     Displacement.x = SumErr.x/num;
@@ -159,7 +159,7 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
     //Now Publish 
     TrackPoints = NewTrackPoints;
     //std::cout<<"TrackPoints Num :"<<TrackPoints.size()<<std::endl;
-    if(Display){
+    if(Display || Save){
         std::vector<Point2i> DrawPointSet;
         for(uint32_t i = 0 ; i < TrackPoints.size(); i++){
             std::vector<Point2f> temp = TrackPoints[i];
