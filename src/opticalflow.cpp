@@ -198,13 +198,15 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
     
     //Get return value
     Point2f res;
-    res.x = resMatrix.at<double>(0,2);
-    res.y = resMatrix.at<double>(1,2);
-    //Debug
-    //std::cout<<"Matrix:"<<resMatrix<<std::endl;
-    std::cout<<"Point:"<<res<<std::endl;
+    if(resMatrix.cols == 3 && resMatrix.rows ==3){
+        res.x = resMatrix.at<double>(0,2);
+        res.y = resMatrix.at<double>(1,2);
+        //Debug
+        //std::cout<<"Matrix:"<<resMatrix<<std::endl;
+        std::cout<<"Point:"<<res<<std::endl;
 
-
+    }
+    
     //Update the trackpoints
     if(Display || Save)
         TrackPoints = FirstJudgment;
