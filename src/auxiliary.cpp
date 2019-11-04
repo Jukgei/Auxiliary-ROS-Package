@@ -123,7 +123,7 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 }
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
-    auxiliary::OpticalFlow myOpticalFlow(true, true); //Two Parameter: isDisplay and isSave 
+    auxiliary::OpticalFlow myOpticalFlow(false, false); //Two Parameter: isDisplay and isSave 
     Point2f DeltaPosition;
     bool ShowRunTime = false;
     high_resolution_clock::time_point StartTime;

@@ -196,6 +196,15 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
         }
     }
     
+    //Get return value
+    Point2f res;
+    res.x = resMatrix.at<double>(0,2);
+    res.y = resMatrix.at<double>(1,2);
+    //Debug
+    //std::cout<<"Matrix:"<<resMatrix<<std::endl;
+    std::cout<<"Point:"<<res<<std::endl;
+
+
     //Update the trackpoints
     if(Display || Save)
         TrackPoints = FirstJudgment;
@@ -221,18 +230,11 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
                 polylines(Visualization,DrawPointSet,false,Scalar(0,0,255));
                 DrawPointSet.clear();
             }
-            //for(uint32_t i = 0; i < DrawPointSet.size();i++)
-            //    printf("(%d,%d)\n",DrawPointSet[i].x,DrawPointSet[i].y);
-            //std::cout<<'\n';
-            //std::cout<<"DrawPointSetsize"<<DrawPointSet.size()<<std::endl;
-            //printf("\n");
-            //polylines(Visualization,DrawPointSet,false,Scalar(0,255,0));
-            //DrawPointSet.clear();
         }
     }
     if(Save)
         vw.write(Visualization);
-    return Displacement;
+    return res;
 }
 
 void auxiliary::OpticalFlow::JudgmentPoint(const std::vector<Point2f> err, std::vector<bool>  &isNice ){
