@@ -12,8 +12,14 @@
 #include "../include/auxiliary/auxiliary.hpp"
 #include "functional"
 
+
+#include <chrono>
+
+
 using namespace std;
 
+using std::chrono::high_resolution_clock;
+using std::chrono::milliseconds;
 
 auxiliary::auxiliaryNode::auxiliaryNode(ros::NodeHandle &n){
     
@@ -117,9 +123,14 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 }
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
-    auxiliary::OpticalFlow myOpticalFlow(false, true); //Two Parameter: isDisplay and isSave 
+    auxiliary::OpticalFlow myOpticalFlow(true, true); //Two Parameter: isDisplay and isSave 
     Point2f DeltaPosition;
+
+    high_resolution_clock::time_point StartTime;
+    high_resolution_clock::time_point EndTime;
+    milliseconds TimeInterval;  
     while(true){
+        StartTime = high_resolution_clock::now();
         if(!myOpticalFlow.GetImage()){
             continue;
         }
@@ -136,22 +147,30 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
 
         myOpticalFlow.Update();
 
-        
+
         //publish position data
         std::vector<float> OpticalflowData;
         OpticalflowData.push_back(DeltaPosition.x);
         OpticalflowData.push_back(DeltaPosition.y);
         auxiliary::opticalflow opt; 
         opt.displacement = OpticalflowData;
+        
+        
+        
         this->OptiFlowPublisher.publish(opt);
 
         if(myOpticalFlow.ReturnDisplay()){
-            if(waitKey(30) == 'q')
+            if(waitKey(1) == 'q')
                 break;
         }
         else
-            usleep(30000);
+            usleep(8000);
+        
+        EndTime = high_resolution_clock::now();
+        TimeInterval = std::chrono::duration_cast<milliseconds>(EndTime - StartTime); 
+        std::cout<<"Run Time:"<<TimeInterval.count()<<"ms"<<std::endl;
        
+        
     }
     
     destroyWindow(myOpticalFlow.ReturnDisplayName());

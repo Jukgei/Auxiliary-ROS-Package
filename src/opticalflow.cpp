@@ -2,32 +2,51 @@
 
 auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
    //this->Cap = VideoCapture a(0);
-    VideoCapture buff(0);
+    VideoCapture buff(0); 
+    
+    
+    if(buff.set(CAP_PROP_FRAME_WIDTH,320)){
+        std::cout<< "Caps set success. width:320"<<std::endl;
+    }
+    if(buff.set(CAP_PROP_FRAME_HEIGHT,240)){
+        std::cout<< "Caps set success. Height: 240"<<std::endl;
+    }
+    if(buff.set((CAP_PROP_FOURCC), CV_FOURCC('M','J','P','G'))){
+        std::cout<< "Caps set FOURCC success" <<std::endl;
+    }
+    if(buff.set(CAP_PROP_FPS,60)){
+        std::cout<< "Caps set success. Fps: 60"<<std::endl;
+    }
     this->Cap = buff;
     this->Save = Save;
     this->Display = Display;
     FrameId = 0;
     DisplayName = "OpticalFlow";
-    if(!Cap.isOpened()){
-        std::cout<<"Cannot open camera."<<std::endl;
-        return ;
-    }
+    //if(!Cap.isOpened()){
+    //    std::cout<<"Cannot open camera."<<std::endl;
+    //    return ;
+    //}
+    //if(Cap.set(CV_CAP_PROP_FPS,60)){
+    //    std::cout<< "Caps set success. Fps: 60"<<std::endl;
+    //}
     fps = Cap.get(CAP_PROP_FPS); //get fps
     std::cout<<"FPS:"<<fps<<std::endl;
     if(fps <= 0 )
         fps = 25;
+    std::cout<<"Get width"<<Cap.get(CAP_PROP_FRAME_WIDTH)<<std::endl;
+    std::cout<<"Get Height"<<Cap.get(CAP_PROP_FRAME_HEIGHT)<<std::endl;
     if(Save){
         vw.open("opticalflowvideo/opticalflow.avi",
                 CV_FOURCC('M','J','P','G'),
                 fps,
-                Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
-                     (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
+                Size((int)Cap.get(CAP_PROP_FRAME_WIDTH),
+                     (int)Cap.get(CAP_PROP_FRAME_HEIGHT))
                 );
         raw.open("opticalflowvideo/opticalflowRGB.avi",
                 CV_FOURCC('M','J','P','G'),
                 fps,
-                Size((int)Cap.get(CAP_PROP_FRAME_WIDTH)/2,
-                     (int)Cap.get(CAP_PROP_FRAME_HEIGHT)/2)
+                Size((int)Cap.get(CAP_PROP_FRAME_WIDTH),
+                     (int)Cap.get(CAP_PROP_FRAME_HEIGHT))
                 );
         if(!vw.isOpened()){
             std::cout<<"Video write error!"<<std::endl;
@@ -67,7 +86,8 @@ bool auxiliary::OpticalFlow::GetImage(){
     Mat buf;
     Mat FrameYCrCb;
     if(Cap.read(buf)){
-        resize(buf, FrameRGB, Size(buf.cols/2,buf.rows/2),0,0,INTER_LINEAR);
+        //resize(buf, FrameRGB, Size(buf.cols/2,buf.rows/2),0,0,INTER_LINEAR);
+        buf.copyTo(FrameRGB);
         raw.write(FrameRGB);
         Width = FrameRGB.cols;
         Height = FrameRGB.rows;
