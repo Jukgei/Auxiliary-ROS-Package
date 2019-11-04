@@ -25,7 +25,7 @@ public:
     int ReturnTrackPointsSize();
     bool ReturnisFindFeature();
     bool ReturnDisplay();
-    void DetectShadow(const std::vector<Point2i> featurepoint);
+    //void DetectShadow(const std::vector<Point2i> featurepoint);
     //void IntPointToFloat(const std::vector<Point2i> i, std::vector<Point2f> &f);
     ~OpticalFlow();
 
@@ -36,13 +36,14 @@ private:
     Mat FrameGray;
     Mat FrameGrayPrev;
     Mat Visualization; 
-    Mat Y;
-    Mat FrameBin;
+    //Mat Y;
+    //Mat FrameBin;
 
     VideoCapture Cap; 
     std::string DisplayName;
     std::vector<std::vector<Point2f>> TrackPoints;
-    std::vector<Point2i> NicePoint;
+    
+    //std::vector<Point2i> NicePoint;
 
     //Some variable about video write
     int fps;
@@ -66,11 +67,15 @@ private:
 
     uint8_t TrackLen;
     
-    int PatchSize;
+    //int PatchSize;
     int Width;
     int Height;
-    int LumenMean;
+    //int LumenMean;
     Point2f Displacement;
+
+    //check good point parameter
+    double isNiceThreshold;   //first easy Judgment parameter
+    double RANSACThreshold;   //RANSAC algorithm threshold
 };
 
 }

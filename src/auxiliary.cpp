@@ -125,12 +125,13 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
     auxiliary::OpticalFlow myOpticalFlow(true, true); //Two Parameter: isDisplay and isSave 
     Point2f DeltaPosition;
-
+    bool ShowRunTime = false;
     high_resolution_clock::time_point StartTime;
     high_resolution_clock::time_point EndTime;
     milliseconds TimeInterval;  
     while(true){
-        StartTime = high_resolution_clock::now();
+        if(ShowRunTime)
+            StartTime = high_resolution_clock::now();
         if(!myOpticalFlow.GetImage()){
             continue;
         }
@@ -166,11 +167,11 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
         else
             usleep(8000);
         
-        EndTime = high_resolution_clock::now();
-        TimeInterval = std::chrono::duration_cast<milliseconds>(EndTime - StartTime); 
-        std::cout<<"Run Time:"<<TimeInterval.count()<<"ms"<<std::endl;
-       
-        
+        if(ShowRunTime){
+            EndTime = high_resolution_clock::now();
+            TimeInterval = std::chrono::duration_cast<milliseconds>(EndTime - StartTime); 
+            std::cout<<"Run Time:"<<TimeInterval.count()<<"ms"<<std::endl;
+        }
     }
     
     destroyWindow(myOpticalFlow.ReturnDisplayName());
