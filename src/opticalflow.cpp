@@ -13,9 +13,9 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
     if(buff.set((CAP_PROP_FOURCC), CV_FOURCC('M','J','P','G'))){
         std::cout<< "Caps set FOURCC success" <<std::endl;
     }
-    if(buff.set(CAP_PROP_FPS,60)){
-        std::cout<< "Caps set success. Fps: 60"<<std::endl;
-    }
+    //if(buff.set(CAP_PROP_FPS,60)){
+    //    std::cout<< "Caps set success. Fps: 60"<<std::endl;
+    //}
     this->Cap = buff;
     this->Save = Save;
     this->Display = Display;
