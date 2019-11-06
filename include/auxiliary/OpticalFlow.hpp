@@ -27,7 +27,7 @@ public:
     bool ReturnDisplay();
     //void DetectShadow(const std::vector<Point2i> featurepoint);
     //void IntPointToFloat(const std::vector<Point2i> i, std::vector<Point2f> &f);
-    ~OpticalFlow();
+    //~OpticalFlow();
 
 private:
     bool Display;

@@ -109,7 +109,7 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
     //    this->myPackage.GetArmPos(i);
     //this->myPackage.GetHeight();
     
-    while(true){
+    while(ros::ok()){
         this->myPackage.ReceiveMsg(myserial,this->myArm);
         //std::cout<<"Receive success"<<std::endl;
         this->myPackage.GroupFrames(this->myArm);
@@ -123,13 +123,13 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 }
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
-    auxiliary::OpticalFlow myOpticalFlow(false, false); //Two Parameter: isDisplay and isSave 
+    auxiliary::OpticalFlow myOpticalFlow(true, true); //Two Parameter: isDisplay and isSave 
     Point2f DeltaPosition;
     bool ShowRunTime = false;
     high_resolution_clock::time_point StartTime;
     high_resolution_clock::time_point EndTime;
     milliseconds TimeInterval;  
-    while(true){
+    while(ros::ok()){
         if(ShowRunTime)
             StartTime = high_resolution_clock::now();
         if(!myOpticalFlow.GetImage()){
@@ -161,11 +161,11 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
         this->OptiFlowPublisher.publish(opt);
 
         if(myOpticalFlow.ReturnDisplay()){
-            if(waitKey(1) == 'q')
+            if(waitKey(5) == 'q')
                 break;
         }
         else
-            usleep(8000);
+            usleep(5000);
         
         if(ShowRunTime){
             EndTime = high_resolution_clock::now();
@@ -174,8 +174,8 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
         }
     }
     
-    destroyWindow(myOpticalFlow.ReturnDisplayName());
-    std::cout<<"OpticalFlow Close."<<std::endl;
+    //destroyWindow(myOpticalFlow.ReturnDisplayName());
+    std::cout<<"OpticalFlow Thread End."<<std::endl;
 }
 
 
