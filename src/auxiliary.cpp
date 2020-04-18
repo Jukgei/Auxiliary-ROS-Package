@@ -29,14 +29,17 @@ auxiliary::auxiliaryNode::auxiliaryNode(ros::NodeHandle &n){
 
 
     myArm[2].SetID(2);
+    //myArm[2].CtrPos(687);
     myArm[2].CtrPos(500);
     myArm[2].CtrTime(20);
 
     myArm[3].SetID(3);
+    //myArm[3].CtrPos(187);
     myArm[3].CtrPos(131);
     myArm[3].CtrTime(20);
     
     myArm[4].SetID(4);
+    myArm[4].CtrPos(625);
     myArm[4].CtrPos(141);
     myArm[4].CtrTime(20);
    
@@ -132,39 +135,39 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
     while(true){
         if(ShowRunTime)
             StartTime = high_resolution_clock::now();
-        if(!myOpticalFlow.GetImage()){
-            continue;
-        }
+        //if(!myOpticalFlow.GetImage()){
+        //    continue;
+        //}
     
-        if(myOpticalFlow.ReturnTrackPointsSize() >0){
-            //std::cout<<"Tracking"<<std::endl;
-            DeltaPosition = myOpticalFlow.OpticalTracking();
-        }
-        
-        if(myOpticalFlow.ReturnisFindFeature()){
-            //std::cout<<"Find Feature Point"<<std::endl;
-            myOpticalFlow.FindFeaturePoints();
-        }
+        //if(myOpticalFlow.ReturnTrackPointsSize() >0){
+        //    //std::cout<<"Tracking"<<std::endl;
+        //    DeltaPosition = myOpticalFlow.OpticalTracking();
+        //}
+        //
+        //if(myOpticalFlow.ReturnisFindFeature()){
+        //    //std::cout<<"Find Feature Point"<<std::endl;
+        //    myOpticalFlow.FindFeaturePoints();
+        //}
 
-        myOpticalFlow.Update();
+        //myOpticalFlow.Update();
 
 
-        //publish position data
-        std::vector<float> OpticalflowData;
-        OpticalflowData.push_back(DeltaPosition.x);
-        OpticalflowData.push_back(DeltaPosition.y);
-        auxiliary::opticalflow opt; 
-        opt.displacement = OpticalflowData;
-        
-        
-        
-        this->OptiFlowPublisher.publish(opt);
+        ////publish position data
+        //std::vector<float> OpticalflowData;
+        //OpticalflowData.push_back(DeltaPosition.x);
+        //OpticalflowData.push_back(DeltaPosition.y);
+        //auxiliary::opticalflow opt; 
+        //opt.displacement = OpticalflowData;
+        //
+        //
+        //
+        //this->OptiFlowPublisher.publish(opt);
 
-        if(myOpticalFlow.ReturnDisplay()){
-            if(waitKey(1) == 'q')
-                break;
-        }
-        else
+        //if(myOpticalFlow.ReturnDisplay()){
+        //    if(waitKey(1) == 'q')
+        //        break;
+        //}
+        //else
             usleep(8000);
         
         if(ShowRunTime){
