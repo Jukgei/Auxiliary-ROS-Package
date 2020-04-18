@@ -25,24 +25,24 @@ auxiliary::auxiliaryNode::auxiliaryNode(ros::NodeHandle &n){
     
     myArm[1].SetID(1);
     myArm[1].CtrPos(500);
-    myArm[1].CtrTime(20);
+    myArm[1].CtrTime(200);
 
 
     myArm[2].SetID(2);
     myArm[2].CtrPos(500);
-    myArm[2].CtrTime(20);
+    myArm[2].CtrTime(200);
 
     myArm[3].SetID(3);
     myArm[3].CtrPos(131);
-    myArm[3].CtrTime(20);
+    myArm[3].CtrTime(200);
     
     myArm[4].SetID(4);
     myArm[4].CtrPos(141);
-    myArm[4].CtrTime(20);
+    myArm[4].CtrTime(200);
    
     myArm[5].SetID(5);
     myArm[5].CtrPos(468);
-    myArm[5].CtrTime(20);
+    myArm[5].CtrTime(200);
     
     this->InitPublishers(n);
     
