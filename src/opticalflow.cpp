@@ -32,8 +32,10 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
     std::cout<<"FPS:"<<fps<<std::endl;
     if(fps <= 0 )
         fps = 25;
-    std::cout<<"Get width"<<Cap.get(CAP_PROP_FRAME_WIDTH)<<std::endl;
-    std::cout<<"Get Height"<<Cap.get(CAP_PROP_FRAME_HEIGHT)<<std::endl;
+    this->Width = Cap.get(CAP_PROP_FRAME_WIDTH);
+    this->Height = Cap.get(CAP_PROP_FRAME_HEIGHT);
+    std::cout<<"Width:"<<Width<<std::endl;
+    std::cout<<"Height:"<<Height<<std::endl;
     if(Save){
         vw.open("opticalflowvideo/opticalflow.avi",
                 CV_FOURCC('M','J','P','G'),
@@ -48,10 +50,10 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
                      (int)Cap.get(CAP_PROP_FRAME_HEIGHT))
                 );
         if(!vw.isOpened()){
-            std::cout<<"Video write error!"<<std::endl;
+            std::cout<<"Video write open error!"<<std::endl;
         }
         if(!raw.isOpened()){
-            std::cout<<"Video(RGB) write error!"<<std::endl;
+            std::cout<<"Video(RGB) write open error!"<<std::endl;
         }
     }
 
@@ -62,7 +64,7 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
     BlockSize = 7;
     k = 0.04;
     UseHarris = true;
-
+    
     FrameId = 0;
     isFindFeature = true;
     DetectInterval = 5;
@@ -78,9 +80,9 @@ auxiliary::OpticalFlow::OpticalFlow(bool Display, bool Save){
     isNiceThreshold = 1;
 }
 
-auxiliary::OpticalFlow::~OpticalFlow(){
-    Cap.release();
-}
+//auxiliary::OpticalFlow::~OpticalFlow(){
+//    Cap.release();
+//}
 
 bool auxiliary::OpticalFlow::GetImage(){
     Mat buf;
@@ -88,8 +90,8 @@ bool auxiliary::OpticalFlow::GetImage(){
     if(Cap.read(buf)){
         buf.copyTo(FrameRGB);
         raw.write(FrameRGB);
-        Width = FrameRGB.cols;
-        Height = FrameRGB.rows;
+        //Width = FrameRGB.cols;
+        //Height = FrameRGB.rows;
         cvtColor(FrameRGB,FrameGray,CV_BGR2GRAY);
         
         if(Display || Save)
@@ -234,8 +236,7 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
             }
         }
     }
-    if(Save)
-        vw.write(Visualization);
+
     return res;
 }
 
@@ -303,7 +304,9 @@ void auxiliary::OpticalFlow::Update(){
     FrameGray.copyTo(FrameGrayPrev);
     if(Display)
       imshow(ReturnDisplayName(),Visualization);
-    
+    if(Save)
+        vw.write(Visualization);
+
 } 
 
 

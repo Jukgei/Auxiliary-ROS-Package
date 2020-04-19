@@ -25,27 +25,27 @@ auxiliary::auxiliaryNode::auxiliaryNode(ros::NodeHandle &n){
     
     myArm[1].SetID(1);
     myArm[1].CtrPos(500);
-    myArm[1].CtrTime(20);
+    myArm[1].CtrTime(200);
 
 
     myArm[2].SetID(2);
     //myArm[2].CtrPos(687);
     myArm[2].CtrPos(500);
-    myArm[2].CtrTime(20);
+    myArm[2].CtrTime(200);
 
     myArm[3].SetID(3);
     //myArm[3].CtrPos(187);
     myArm[3].CtrPos(131);
-    myArm[3].CtrTime(20);
+    myArm[3].CtrTime(200);
     
     myArm[4].SetID(4);
-    myArm[4].CtrPos(625);
+    //myArm[4].CtrPos(625);
     myArm[4].CtrPos(141);
-    myArm[4].CtrTime(20);
+    myArm[4].CtrTime(200);
    
     myArm[5].SetID(5);
     myArm[5].CtrPos(468);
-    myArm[5].CtrTime(20);
+    myArm[5].CtrTime(200);
     
     this->InitPublishers(n);
     
@@ -112,7 +112,7 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
     //    this->myPackage.GetArmPos(i);
     //this->myPackage.GetHeight();
     
-    while(true){
+    while(ros::ok()){
         this->myPackage.ReceiveMsg(myserial,this->myArm);
         //std::cout<<"Receive success"<<std::endl;
         this->myPackage.GroupFrames(this->myArm);
@@ -126,49 +126,49 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 }
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
-    auxiliary::OpticalFlow myOpticalFlow(false, false); //Two Parameter: isDisplay and isSave 
+    auxiliary::OpticalFlow myOpticalFlow(true, true); //Two Parameter: isDisplay and isSave 
     Point2f DeltaPosition;
     bool ShowRunTime = false;
     high_resolution_clock::time_point StartTime;
     high_resolution_clock::time_point EndTime;
     milliseconds TimeInterval;  
-    while(true){
+    while(ros::ok()){
         if(ShowRunTime)
             StartTime = high_resolution_clock::now();
         //if(!myOpticalFlow.GetImage()){
         //    continue;
         //}
     
-        //if(myOpticalFlow.ReturnTrackPointsSize() >0){
-        //    //std::cout<<"Tracking"<<std::endl;
-        //    DeltaPosition = myOpticalFlow.OpticalTracking();
-        //}
-        //
-        //if(myOpticalFlow.ReturnisFindFeature()){
-        //    //std::cout<<"Find Feature Point"<<std::endl;
-        //    myOpticalFlow.FindFeaturePoints();
-        //}
+        if(myOpticalFlow.ReturnTrackPointsSize() >0){
+            //std::cout<<"Tracking"<<std::endl;
+            DeltaPosition = myOpticalFlow.OpticalTracking();
+        }
+        
+        if(myOpticalFlow.ReturnisFindFeature()){
+            //std::cout<<"Find Feature Point"<<std::endl;
+            myOpticalFlow.FindFeaturePoints();
+        }
 
-        //myOpticalFlow.Update();
+        myOpticalFlow.Update();
 
 
-        ////publish position data
-        //std::vector<float> OpticalflowData;
-        //OpticalflowData.push_back(DeltaPosition.x);
-        //OpticalflowData.push_back(DeltaPosition.y);
-        //auxiliary::opticalflow opt; 
-        //opt.displacement = OpticalflowData;
-        //
-        //
-        //
-        //this->OptiFlowPublisher.publish(opt);
+        //publish position data
+        std::vector<float> OpticalflowData;
+        OpticalflowData.push_back(DeltaPosition.x);
+        OpticalflowData.push_back(DeltaPosition.y);
+        auxiliary::opticalflow opt; 
+        opt.displacement = OpticalflowData;
+        
+        
+        
+        this->OptiFlowPublisher.publish(opt);
 
-        //if(myOpticalFlow.ReturnDisplay()){
-        //    if(waitKey(1) == 'q')
-        //        break;
-        //}
-        //else
-            usleep(8000);
+        if(myOpticalFlow.ReturnDisplay()){
+            if(waitKey(5) == 'q')
+                break;
+        }
+        else
+            usleep(5000);
         
         if(ShowRunTime){
             EndTime = high_resolution_clock::now();
@@ -177,8 +177,8 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
         }
     }
     
-    destroyWindow(myOpticalFlow.ReturnDisplayName());
-    std::cout<<"OpticalFlow Close."<<std::endl;
+    //destroyWindow(myOpticalFlow.ReturnDisplayName());
+    std::cout<<"OpticalFlow Thread End."<<std::endl;
 }
 
 
