@@ -205,7 +205,7 @@ Point2f auxiliary::OpticalFlow::OpticalTracking(){
         res.y = resMatrix.at<double>(1,2);
         //Debug
         //std::cout<<"Matrix:"<<resMatrix<<std::endl;
-        std::cout<<"Point:"<<res<<std::endl;
+        //std::cout<<"Point:"<<res<<std::endl;
 
     }
     
