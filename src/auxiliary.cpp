@@ -112,6 +112,7 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
     //    this->myPackage.GetArmPos(i);
     //this->myPackage.GetHeight();
     
+    ros::Rate LoopRate(100);
     while(ros::ok()){
         this->myPackage.ReceiveMsg(myserial,this->myArm);
         //std::cout<<"Receive success"<<std::endl;
@@ -120,7 +121,8 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
         this->myPackage.SendControlPackage(myserial);
         //std::cout<<"SendControl"<<std::endl;
         //Don't clear feedback Bit
-        usleep(10000); //10ms
+        //usleep(10000); //10ms
+        LoopRate.sleep();
     }
 
 }
