@@ -29,17 +29,17 @@ auxiliary::auxiliaryNode::auxiliaryNode(ros::NodeHandle &n){
 
 
     myArm[2].SetID(2);
-    //myArm[2].CtrPos(687);
+    //myArm[2].CtrPos(583);
     myArm[2].CtrPos(500);
     myArm[2].CtrTime(50);
 
     myArm[3].SetID(3);
-    //myArm[3].CtrPos(187);
+    //myArm[3].CtrPos(0);
     myArm[3].CtrPos(131);
     myArm[3].CtrTime(50);
     
     myArm[4].SetID(4);
-    //myArm[4].CtrPos(625);
+    //myArm[4].CtrPos(745);
     myArm[4].CtrPos(141);
     myArm[4].CtrTime(50);
    
@@ -129,12 +129,14 @@ void auxiliary::auxiliaryNode::DataPackageThread(){
 
 void auxiliary::auxiliaryNode::OpticalFlowThread(){
     auxiliary::OpticalFlow myOpticalFlow(false, false); //Two Parameter: isDisplay and isSave 
+    //std::cout<<"optical start"<<std::endl;
     Point2f DeltaPosition;
-    bool ShowRunTime = false;
+    bool ShowRunTime = true;
     high_resolution_clock::time_point StartTime;
     high_resolution_clock::time_point EndTime;
     milliseconds TimeInterval;  
-    while(ros::ok()){
+    ros::Rate LoopRate(50);
+    while(true){
         if(ShowRunTime)
             StartTime = high_resolution_clock::now();
         if(!myOpticalFlow.GetImage()){
@@ -158,9 +160,13 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
         std::vector<float> OpticalflowData;
         OpticalflowData.push_back(DeltaPosition.x);
         OpticalflowData.push_back(DeltaPosition.y);
+        std::cout<<"delta x is "<< DeltaPosition.x<<"  delta y is "<<DeltaPosition.y<<std::endl;
         auxiliary::opticalflow opt; 
         opt.displacement = OpticalflowData;
-        
+       
+        //if(abs(DeltaPosition.x) > 400 && abs(DeltaPosition.y) > 400){
+        //    std::cout<<"error!"<<std::endl;
+        //}
         
         
         this->OptiFlowPublisher.publish(opt);
@@ -169,14 +175,15 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
             if(waitKey(5) == 'q')
                 break;
         }
-        else
-            usleep(5000);
+        //else
+        //    usleep(5000);
         
         if(ShowRunTime){
             EndTime = high_resolution_clock::now();
             TimeInterval = std::chrono::duration_cast<milliseconds>(EndTime - StartTime); 
             std::cout<<"Run Time:"<<TimeInterval.count()<<"ms"<<std::endl;
         }
+        LoopRate.sleep();
     }
     
     //destroyWindow(myOpticalFlow.ReturnDisplayName());
