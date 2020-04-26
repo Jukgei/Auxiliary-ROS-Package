@@ -19,7 +19,7 @@ SET(SRC_LIST src/main.cpp
             src/opticalflow.cpp)
 
 ## Declare ROS messages and services
-add_message_files(FILES state.msg controls.msg opticalflow.msg)
+add_message_files(FILES state.msg controls.msg opticalflow.msg gripper.msg)
 #add_service_files(FILES AddTwoInts.srv)
 
 ## Generate added messages and services

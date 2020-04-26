@@ -29,17 +29,17 @@ auxiliary::auxiliaryNode::auxiliaryNode(ros::NodeHandle &n){
 
 
     myArm[2].SetID(2);
-    //myArm[2].CtrPos(583);
+    //myArm[2].CtrPos(792);
     myArm[2].CtrPos(500);
     myArm[2].CtrTime(50);
 
     myArm[3].SetID(3);
-    //myArm[3].CtrPos(0);
+    //myArm[3].CtrPos(251);
     myArm[3].CtrPos(131);
     myArm[3].CtrTime(50);
     
     myArm[4].SetID(4);
-    //myArm[4].CtrPos(745);
+    //myArm[4].CtrPos(664);
     myArm[4].CtrPos(141);
     myArm[4].CtrTime(50);
    
@@ -80,23 +80,46 @@ void auxiliary::auxiliaryNode::InitOptFlowThread(){
 void auxiliary::auxiliaryNode::InitSubcribers(ros::NodeHandle &n){
     ArmControlSubscriber = n.subscribe<auxiliary::controls>
         ("controls",10,&auxiliaryNode::GetArmControlsCallBack,this);
+    GripperControlSubscriber = n.subscribe<auxiliary::gripper>
+        ("gripper",10,&auxiliaryNode::GripperControlsCallBack,this);
 }
 
 void auxiliary::auxiliaryNode::GetArmControlsCallBack(const auxiliary::controls::ConstPtr& msg){
     //Get Arm Position controls and time controls
     std::vector<uint16_t> ArmCtrPos = msg->armCtr;
     std::vector<uint16_t> ArmCtrTime = msg->timeCtr;
-    if(msg->GripSta ==  0x01)
-        this->myPackage.SetGripperSta(grasp);
-    else if(msg->GripSta == 0x00)
-        this->myPackage.SetGripperSta(loose);
-    else 
-        this->myPackage.SetGripperSta(stop);
+    //if(msg->GripSta ==  0x01)
+    //    this->myPackage.SetGripperSta(grasp);
+    //else if(msg->GripSta == 0x00)
+    //    this->myPackage.SetGripperSta(loose);
+    //else 
+    //    this->myPackage.SetGripperSta(stop);
     //Prepare control
     for(uint8_t i = 1; i <=5; i++){
         this->myArm[i].CtrPos(ArmCtrPos[i]);
         this->myArm[i].CtrTime(ArmCtrTime[i]);
     }
+    //DEBUG PRINT
+    //for(int i = 1; i <= 5; i ++)
+    //        printf("Arm[%d] Ctr Pos: %d, Ctr Time:%d \n",i,myArm[i].GetCtrPos(),myArm[i].GetCtrTime());
+}
+
+void auxiliary::auxiliaryNode::GripperControlsCallBack(const auxiliary::gripper::ConstPtr& msg){
+    //Get Arm Position controls and time controls
+    if(msg->GripSta ==  0x01){
+        this->myPackage.SetGripperSta(grasp);
+        std::cout<<"Grasp"<<std::endl;
+    }
+    else if(msg->GripSta == 0x00){
+        this->myPackage.SetGripperSta(loose);
+        std::cout<<"loose"<<std::endl;
+    }
+    else{
+        this->myPackage.SetGripperSta(stop);
+        std::cout<<"stop"<<std::endl;
+    }
+    //Prepare control
+    
     //DEBUG PRINT
     //for(int i = 1; i <= 5; i ++)
     //        printf("Arm[%d] Ctr Pos: %d, Ctr Time:%d \n",i,myArm[i].GetCtrPos(),myArm[i].GetCtrTime());
@@ -131,7 +154,7 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
     auxiliary::OpticalFlow myOpticalFlow(false, false); //Two Parameter: isDisplay and isSave 
     //std::cout<<"optical start"<<std::endl;
     Point2f DeltaPosition;
-    bool ShowRunTime = true;
+    bool ShowRunTime = false;
     high_resolution_clock::time_point StartTime;
     high_resolution_clock::time_point EndTime;
     milliseconds TimeInterval;  
@@ -160,7 +183,7 @@ void auxiliary::auxiliaryNode::OpticalFlowThread(){
         std::vector<float> OpticalflowData;
         OpticalflowData.push_back(DeltaPosition.x);
         OpticalflowData.push_back(DeltaPosition.y);
-        std::cout<<"delta x is "<< DeltaPosition.x<<"  delta y is "<<DeltaPosition.y<<std::endl;
+        //std::cout<<"delta x is "<< DeltaPosition.x<<"  delta y is "<<DeltaPosition.y<<std::endl;
         auxiliary::opticalflow opt; 
         opt.displacement = OpticalflowData;
        

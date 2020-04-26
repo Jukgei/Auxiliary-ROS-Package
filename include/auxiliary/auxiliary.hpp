@@ -12,6 +12,7 @@
 
 #include "OpticalFlow.hpp"
 #include "auxiliary/controls.h"
+#include "auxiliary/gripper.h"
 
 #define FIRST_HEADER            0
 #define SECOND_HEADER           1
@@ -132,7 +133,9 @@ private:
     ros::Publisher OptiFlowPublisher;
 
     ros::Subscriber ArmControlSubscriber;
+    ros::Subscriber GripperControlSubscriber;
     void GetArmControlsCallBack(const auxiliary::controls::ConstPtr& msg);
+    void GripperControlsCallBack(const auxiliary::gripper::ConstPtr& msg);
     uint16_t PublishFrequency;
     
     //std::vector<std::_Bind_helper<false, void (auxiliaryNode::*)(auxiliaryNode *),auxiliaryNode*, auxiliaryNode*&>::type> b;
